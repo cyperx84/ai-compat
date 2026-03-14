@@ -1,0 +1,504 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { tools } from '../data/tools';
+import { models } from '../data/models';
+import { features } from '../data/features';
+import { routes } from '../data/routes';
+import { STATUS_ICONS, STATUS_COLORS } from '../data/types';
+import type { Status } from '../data/types';
+
+// Compute stats
+const totalCompatChecks = tools.reduce((sum, t) => sum + t.models.length, 0)
+  + features.reduce((sum, f) => sum + f.models.length, 0)
+  + routes.reduce((sum, r) => sum + r.routes.length, 0);
+
+const supportedCount = tools.reduce((sum, t) => sum + t.models.filter(m => m.status === 'supported').length, 0)
+  + features.reduce((sum, f) => sum + f.models.filter(m => m.status === 'supported').length, 0)
+  + routes.reduce((sum, r) => sum + r.routes.filter(r => r.status === 'supported').length, 0);
+
+// Get featured compatibility: top tools × top models
+const topTools = tools.slice(0, 6);
+const topModels = models.slice(0, 7);
+
+function getStatusFor(tool: typeof tools[0], modelId: string): Status | undefined {
+  const m = tool.models.find(m => m.model === modelId);
+  return m?.status;
+}
+
+function getStatusIcon(status: Status | undefined): string {
+  if (!status) return '·';
+  return STATUS_ICONS[status];
+}
+
+// MCP tools with best support
+const mcpSupported = tools.filter(t => t.mcpSupport === 'supported');
+const mcpPartial = tools.filter(t => t.mcpSupport === 'partial');
+---
+
+<Layout title="Home">
+  <!-- Hero -->
+  <section class="hero" style="position: relative; overflow: hidden;">
+    <div class="hero-glow" style="top: -200px; right: -100px;"></div>
+    <div class="hero-content">
+      <div class="hero-tag mono">[ compatibility matrix ]</div>
+      <h1 class="hero-title">
+        Can I use <span class="text-accent">X</span> with <span class="text-accent">Y</span>?
+      </h1>
+      <p class="hero-subtitle">
+        The reference for AI model ↔ tool compatibility.
+        <br/>
+        <span class="text-muted">Real data. Evidence links. Updated by the community.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">{tools.length}</div>
+      <div class="stat-label">Tools Tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{models.length}</div>
+      <div class="stat-label">Models</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{features.length}</div>
+      <div class="stat-label">Features</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{Math.round(supportedCount / totalCompatChecks * 100)}%</div>
+      <div class="stat-label">Compatibility</div>
+    </div>
+  </div>
+
+  <!-- Quick Matrix -->
+  <section class="section">
+    <h2>Tool × Model Matrix</h2>
+    <div class="matrix-scroll">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th class="sticky-col">Tool</th>
+            {topModels.map(m => (
+              <th class="model-col" title={`${m.name} (${m.provider})`}>
+                <span class="model-header">{m.name.replace('Claude ', 'C').replace('Gemini ', 'G').replace('DeepSeek ', 'DS ').replace('GPT-', 'G-').replace('Copilot', 'Cop')}</span>
+              </th>
+            ))}
+            <th>MCP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topTools.map(tool => (
+            <tr>
+              <td class="sticky-col tool-name">
+                <a href={`/tools/${tool.id}`}>{tool.name}</a>
+                <span class="tool-type">{tool.type}</span>
+              </td>
+              {topModels.map(model => {
+                const status = getStatusFor(tool, model.id);
+                return (
+                  <td class="matrix-cell" title={status || 'unknown'}>
+                    <span class={`status-dot-sm status-${status || 'none'}`}></span>
+                  </td>
+                );
+              })}
+              <td>
+                <span class={`badge badge-${tool.mcpSupport}`}>
+                  {STATUS_ICONS[tool.mcpSupport]}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <span class="legend-item"><span class="status-dot-sm status-supported"></span> Supported</span>
+      <span class="legend-item"><span class="status-dot-sm status-partial"></span> Partial</span>
+      <span class="legend-item"><span class="status-dot-sm status-unofficial"></span> Unofficial</span>
+      <span class="legend-item"><span class="status-dot-sm status-broken"></span> Broken/None</span>
+    </div>
+  </section>
+
+  <!-- Browse sections -->
+  <div class="browse-grid">
+    <a href="/tools" class="browse-card">
+      <div class="browse-icon">⟐</div>
+      <div class="browse-content">
+        <h3>Tools</h3>
+        <p>IDEs, editors, CLIs, extensions — which models can each tool use?</p>
+      </div>
+      <span class="browse-arrow">→</span>
+    </a>
+
+    <a href="/models" class="browse-card">
+      <div class="browse-icon">◈</div>
+      <div class="browse-content">
+        <h3>Models</h3>
+        <p>Claude, GPT, Gemini, DeepSeek — which tools support each model?</p>
+      </div>
+      <span class="browse-arrow">→</span>
+    </a>
+
+    <a href="/features" class="browse-card">
+      <div class="browse-icon">⬡</div>
+      <div class="browse-content">
+        <h3>Features</h3>
+        <p>Vision, tool use, browsing, extended thinking — per-model capabilities.</p>
+      </div>
+      <span class="browse-arrow">→</span>
+    </a>
+
+    <a href="/routes" class="browse-card">
+      <div class="browse-icon">⟡</div>
+      <div class="browse-content">
+        <h3>Routes</h3>
+        <p>OpenRouter, LiteLLM, Bedrock — which providers go through which routers?</p>
+      </div>
+      <span class="browse-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- MCP Support -->
+  <section class="section">
+    <h2>MCP Support by Tool</h2>
+    <div class="mcp-grid">
+      {mcpSupported.map(tool => (
+        <a href={`/tools/${tool.id}`} class="mcp-card mcp-supported">
+          <div class="mcp-name">{tool.name}</div>
+          <div class="mcp-status">✅ Native MCP</div>
+          {tool.mcpNotes && <div class="mcp-notes">{tool.mcpNotes}</div>}
+        </a>
+      ))}
+      {mcpPartial.map(tool => (
+        <a href={`/tools/${tool.id}`} class="mcp-card mcp-partial">
+          <div class="mcp-name">{tool.name}</div>
+          <div class="mcp-status">⚠️ Partial MCP</div>
+          {tool.mcpNotes && <div class="mcp-notes">{tool.mcpNotes}</div>}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Recent updates -->
+  <section class="section">
+    <h2>Latest Data Points</h2>
+    <div class="updates-list">
+      <div class="update-item">
+        <span class="update-status">✅</span>
+        <span class="update-text"><strong>Claude 4.5 Sonnet</strong> → Cursor</span>
+        <span class="update-evidence">
+          <a href="https://cursor.sh/models" class="evidence-link" target="_blank">docs</a>
+        </span>
+      </div>
+      <div class="update-item">
+        <span class="update-status">✅</span>
+        <span class="update-text"><strong>MCP</strong> → Cursor (stdio transport)</span>
+        <span class="update-evidence">
+          <a href="https://docs.cursor.com/context/model-context-protocol" class="evidence-link" target="_blank">docs</a>
+        </span>
+      </div>
+      <div class="update-item">
+        <span class="update-status">✅</span>
+        <span class="update-text"><strong>o3-mini</strong> → Codex CLI</span>
+        <span class="update-evidence">
+          <a href="https://github.com/openai/codex" class="evidence-link" target="_blank">github</a>
+        </span>
+      </div>
+      <div class="update-item">
+        <span class="update-status">⚠️</span>
+        <span class="update-text"><strong>DeepSeek V3</strong> → Claude Code (via proxy)</span>
+      </div>
+      <div class="update-item">
+        <span class="update-status">🔧</span>
+        <span class="update-text"><strong>Gemini 2.5 Pro</strong> → Codex CLI (via proxy)</span>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    padding: 3rem 0 2rem;
+  }
+
+  .hero-tag {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-title {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .text-accent {
+    color: var(--accent);
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* Matrix table */
+  .matrix-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+  }
+
+  .matrix-table {
+    min-width: 800px;
+  }
+
+  .matrix-table th, .matrix-table td {
+    white-space: nowrap;
+  }
+
+  .sticky-col {
+    position: sticky;
+    left: 0;
+    background: var(--bg-secondary);
+    z-index: 5;
+    min-width: 140px;
+  }
+
+  .tool-name a {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .tool-name a:hover {
+    color: var(--accent);
+  }
+
+  .tool-type {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 400;
+  }
+
+  .model-header {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    display: inline-block;
+    font-size: 0.65rem;
+    max-height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .matrix-cell {
+    text-align: center;
+    min-width: 45px;
+  }
+
+  .status-dot-sm {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .status-supported { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+  .status-partial { background: var(--yellow); box-shadow: 0 0 6px rgba(234,179,8,0.4); }
+  .status-unofficial { background: var(--blue); box-shadow: 0 0 6px rgba(59,130,246,0.4); }
+  .status-broken { background: var(--red); box-shadow: 0 0 4px rgba(239,68,68,0.3); }
+  .status-deprecated { background: var(--gray); }
+  .status-none { background: var(--border); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Browse grid */
+  .browse-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .browse-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .browse-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all var(--transition);
+    color: var(--text);
+  }
+
+  .browse-card:hover {
+    border-color: var(--accent-dim);
+    background: rgba(34, 211, 238, 0.03);
+  }
+
+  .browse-icon {
+    font-size: 1.5rem;
+    color: var(--accent);
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .browse-content h3 {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .browse-content p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .browse-arrow {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    transition: transform var(--transition);
+  }
+
+  .browse-card:hover .browse-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  /* MCP grid */
+  .mcp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .mcp-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .mcp-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mcp-card {
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+    color: var(--text);
+  }
+
+  .mcp-card:hover {
+    border-color: var(--border-hover);
+  }
+
+  .mcp-supported {
+    background: rgba(34, 197, 94, 0.04);
+  }
+
+  .mcp-partial {
+    background: rgba(234, 179, 8, 0.04);
+  }
+
+  .mcp-name {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .mcp-status {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+  }
+
+  .mcp-notes {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    line-height: 1.4;
+  }
+
+  /* Updates list */
+  .updates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .update-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .update-status {
+    flex-shrink: 0;
+  }
+
+  .update-text {
+    flex: 1;
+    color: var(--text-secondary);
+  }
+
+  .update-text strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .update-evidence {
+    flex-shrink: 0;
+  }
+</style>

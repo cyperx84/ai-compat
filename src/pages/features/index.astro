@@ -1,0 +1,150 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { features } from '../../data/features';
+import { models } from '../../data/models';
+import { STATUS_ICONS, STATUS_LABELS } from '../../data/types';
+---
+
+<Layout title="Features">
+  <div class="page-header">
+    <h1>Features</h1>
+    <p class="page-desc">Model capabilities mapped across providers. {features.length} features tracked.</p>
+  </div>
+
+  <div class="search-container">
+    <div class="search-wrapper">
+      <input type="text" class="search-input" placeholder="Search features..." id="featureSearch" />
+    </div>
+  </div>
+
+  <div id="features-list">
+    {features.map(feature => (
+      <section class="section feature-section" data-name={feature.name.toLowerCase()}>
+        <div class="feature-header">
+          <div>
+            <h2 style="margin-bottom: 0.25rem;">{feature.name}</h2>
+            <p class="feature-cat">{feature.category}</p>
+          </div>
+          <p class="feature-desc-text">{feature.description}</p>
+        </div>
+
+        <div class="matrix-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Provider</th>
+                <th>Status</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {feature.models.map(compat => {
+                const model = models.find(m => m.id === compat.model);
+                return (
+                  <tr>
+                    <td>
+                      {model ? (
+                        <a href={`/models/${compat.model}`}>{model.name}</a>
+                      ) : (
+                        <span class="mono">{compat.model}</span>
+                      )}
+                    </td>
+                    <td class="text-muted">{model?.provider || '—'}</td>
+                    <td>
+                      <span class={`badge badge-${compat.status}`}>
+                        {STATUS_ICONS[compat.status]} {STATUS_LABELS[compat.status]}
+                      </span>
+                    </td>
+                    <td class="text-muted mono" style="font-size: 0.75rem;">{compat.notes || '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))}
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-mono);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .page-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .feature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .feature-header {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  .feature-cat {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .feature-desc-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    max-width: 400px;
+    line-height: 1.5;
+  }
+
+  .matrix-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+  }
+
+  .feature-section h2 {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .feature-section h2::before {
+    content: none;
+  }
+
+  .text-muted { color: var(--text-muted); }
+</style>
+
+<script>
+  const searchInput = document.getElementById('featureSearch');
+  const sections = document.querySelectorAll('.feature-section');
+
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase();
+    sections.forEach(section => {
+      const el = section as HTMLElement;
+      el.style.display = !query || (el.dataset.name || '').includes(query) ? '' : 'none';
+    });
+  });
+</script>

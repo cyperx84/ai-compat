@@ -1,0 +1,189 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { models } from '../../data/models';
+import { tools } from '../../data/tools';
+import { features } from '../../data/features';
+import { STATUS_ICONS, STATUS_LABELS } from '../../data/types';
+
+export function getStaticPaths() {
+  return models.map(model => ({
+    params: { id: model.id },
+    props: { model },
+  }));
+}
+
+const { model } = Astro.props;
+
+// Find all tools that support this model
+const toolCompat = tools
+  .map(tool => {
+    const compat = tool.models.find(m => m.model === model.id);
+    return compat ? { tool, status: compat.status, notes: compat.notes, since: compat.since, evidence: compat.evidence } : null;
+  })
+  .filter(Boolean);
+
+// Find all features for this model
+const featureCompat = features
+  .map(feature => {
+    const compat = feature.models.find(m => m.model === model.id);
+    return compat ? { feature, status: compat.status, notes: compat.notes } : null;
+  })
+  .filter(Boolean);
+---
+
+<Layout title={model.name}>
+  <a href="/models" class="back-link">← back to models</a>
+
+  <div class="detail-header">
+    <h1>{model.name}</h1>
+    <div class="detail-meta">
+      <span class="provider-tag">{model.provider}</span>
+      {model.contextWindow && <span class="mono text-muted">{model.contextWindow} ctx</span>}
+      {model.released && <span class="mono text-muted">{model.released}</span>}
+      {model.website && <a href={model.website} target="_blank" rel="noopener" class="ext-link">website ↗</a>}
+    </div>
+  </div>
+
+  <p class="detail-description">{model.description}</p>
+
+  <!-- Capabilities -->
+  <section class="section">
+    <h2>Capabilities</h2>
+    <div class="cap-grid">
+      {model.capabilities.map(cap => (
+        <span class="cap-tag">{cap}</span>
+      ))}
+    </div>
+  </section>
+
+  <!-- Tool compatibility -->
+  <section class="section">
+    <h2>Tool Compatibility ({toolCompat.length} tools)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Since</th>
+        </tr>
+      </thead>
+      <tbody>
+        {toolCompat.map((item: any) => (
+          <tr>
+            <td><a href={`/tools/${item.tool.id}`}>{item.tool.name}</a></td>
+            <td class="text-muted">{item.tool.type}</td>
+            <td>
+              <span class={`badge badge-${item.status}`}>
+                {STATUS_ICONS[item.status]} {STATUS_LABELS[item.status]}
+              </span>
+            </td>
+            <td class="text-muted mono" style="font-size: 0.75rem;">{item.notes || '—'}</td>
+            <td class="text-muted mono">{item.since || '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Feature compatibility -->
+  <section class="section">
+    <h2>Feature Support</h2>
+    <div class="feature-grid">
+      {featureCompat.map((item: any) => (
+        <div class={`feature-card feature-${item.status}`}>
+          <div class="feature-header">
+            <span class="feature-icon">{STATUS_ICONS[item.status]}</span>
+            <span class="feature-name">{item.feature.name}</span>
+          </div>
+          <p class="feature-desc">{item.feature.description}</p>
+          {item.notes && <span class="feature-notes">{item.notes}</span>}
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .provider-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .ext-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .cap-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .cap-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-secondary);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .feature-card {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .feature-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .feature-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .feature-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .feature-notes {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--yellow);
+  }
+
+  .text-muted { color: var(--text-muted); }
+</style>

@@ -1,0 +1,207 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { models } from '../../data/models';
+import { tools } from '../../data/tools';
+import { STATUS_ICONS } from '../../data/types';
+
+// Compute per-model stats
+const modelStats = models.map(model => {
+  const toolCount = tools.filter(t => t.models.some(m => m.model === model.id)).length;
+  const supportedIn = tools.filter(t => t.models.some(m => m.model === model.id && m.status === 'supported')).length;
+  return { ...model, toolCount, supportedIn };
+});
+
+// Group by provider
+const providers = [...new Set(models.map(m => m.provider))];
+---
+
+<Layout title="Models">
+  <div class="page-header">
+    <h1>Models</h1>
+    <p class="page-desc">AI models and which tools support them. {models.length} models tracked.</p>
+  </div>
+
+  <div class="search-container">
+    <div class="search-wrapper">
+      <input type="text" class="search-input" placeholder="Search models..." id="modelSearch" />
+    </div>
+  </div>
+
+  <div id="models-list">
+    {providers.map(provider => (
+      <div class="provider-group" data-provider={provider}>
+        <h2 class="group-label">{provider}</h2>
+        <div class="grid-2">
+          {modelStats.filter(m => m.provider === provider).map(model => (
+            <a href={`/models/${model.id}`} class="card model-card" data-name={model.name.toLowerCase()}>
+              <div class="model-card-header">
+                <h3>{model.name}</h3>
+                {model.contextWindow && <span class="ctx-badge">{model.contextWindow}</span>}
+              </div>
+              <p class="model-card-desc">{model.description}</p>
+              <div class="model-card-stats">
+                <span class="stat">
+                  <span class="stat-val" style="color: var(--green);">{model.supportedIn}</span>
+                  <span class="stat-lbl">supported</span>
+                </span>
+                <span class="stat">
+                  <span class="stat-val">{model.toolCount}</span>
+                  <span class="stat-lbl">total</span>
+                </span>
+                {model.released && (
+                  <span class="stat">
+                    <span class="stat-val">{model.released}</span>
+                  </span>
+                )}
+              </div>
+              <div class="model-card-caps">
+                {model.capabilities.slice(0, 5).map(cap => (
+                  <span class="cap-dot">{cap}</span>
+                ))}
+                {model.capabilities.length > 5 && <span class="cap-more">+{model.capabilities.length - 5}</span>}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-mono);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .page-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .provider-group {
+    margin-bottom: 2rem;
+  }
+
+  .group-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  .model-card {
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .model-card:hover {
+    border-color: var(--accent-dim);
+  }
+
+  .model-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .model-card-header h3 {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .ctx-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    padding: 0.15rem 0.5rem;
+    background: rgba(34, 211, 238, 0.08);
+    color: var(--accent-dim);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .model-card-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .model-card-stats {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+  }
+
+  .stat-val {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .stat-lbl {
+    color: var(--text-muted);
+    margin-left: 0.2rem;
+  }
+
+  .model-card-caps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .cap-dot {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    padding: 0.1rem 0.4rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .cap-more {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  const searchInput = document.getElementById('modelSearch');
+  const cards = document.querySelectorAll('.model-card');
+  const groups = document.querySelectorAll('.provider-group');
+
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase();
+    cards.forEach(card => {
+      const el = card as HTMLElement;
+      el.style.display = !query || (el.dataset.name || '').includes(query) ? '' : 'none';
+    });
+    groups.forEach(g => {
+      const gCards = (g as HTMLElement).querySelectorAll('.model-card');
+      const anyVisible = Array.from(gCards).some(c => (c as HTMLElement).style.display !== 'none');
+      (g as HTMLElement).style.display = anyVisible ? '' : 'none';
+    });
+  });
+</script>
