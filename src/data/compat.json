@@ -1,0 +1,223 @@
+{
+  "models": [
+    {
+      "id": "claude-sonnet-4",
+      "slug": "claude-sonnet-4",
+      "name": "Claude Sonnet 4",
+      "provider": "Anthropic",
+      "description": "Balanced frontier model with strong coding, planning, and long-context performance.",
+      "contextWindow": "200K",
+      "released": "2025-05",
+      "capabilities": ["coding", "reasoning", "long-context", "agent-planning"],
+      "website": "https://www.anthropic.com"
+    },
+    {
+      "id": "claude-opus-4",
+      "slug": "claude-opus-4",
+      "name": "Claude Opus 4",
+      "provider": "Anthropic",
+      "description": "High-capability model tuned for difficult multi-step engineering and research tasks.",
+      "contextWindow": "200K",
+      "released": "2025-05",
+      "capabilities": ["deep-reasoning", "coding", "analysis", "agent-planning"],
+      "website": "https://www.anthropic.com"
+    },
+    {
+      "id": "gpt-4.1",
+      "slug": "gpt-4.1",
+      "name": "GPT-4.1",
+      "provider": "OpenAI",
+      "description": "Reliable general-purpose model with strong coding quality and broad tool ecosystem support.",
+      "contextWindow": "1M",
+      "released": "2025-04",
+      "capabilities": ["coding", "reasoning", "instruction-following", "tool-use"],
+      "website": "https://openai.com"
+    },
+    {
+      "id": "gemini-2.5-pro",
+      "slug": "gemini-2.5-pro",
+      "name": "Gemini 2.5 Pro",
+      "provider": "Google",
+      "description": "Large-context multimodal model suited to repo analysis, docs synthesis, and vision-heavy workflows.",
+      "contextWindow": "1M",
+      "released": "2025-03",
+      "capabilities": ["multimodal", "coding", "analysis", "long-context"],
+      "website": "https://deepmind.google"
+    }
+  ],
+  "harnesses": [
+    {
+      "id": "claude-code",
+      "slug": "claude-code",
+      "name": "Claude Code",
+      "type": "cli-agent",
+      "description": "Terminal-first coding harness with patching, planning, and repo-aware workflows.",
+      "provider": "Anthropic",
+      "status": "stable",
+      "website": "https://www.anthropic.com",
+      "features": ["shell-access", "patch-apply", "planning", "repo-navigation"]
+    },
+    {
+      "id": "codex-cli",
+      "slug": "codex-cli",
+      "name": "Codex CLI",
+      "type": "cli-agent",
+      "description": "OpenAI command-line coding harness with strong editing and explanation loops.",
+      "provider": "OpenAI",
+      "status": "stable",
+      "website": "https://github.com/openai/codex",
+      "features": ["shell-access", "patch-apply", "code-explanations", "repo-navigation"]
+    },
+    {
+      "id": "gemini-cli",
+      "slug": "gemini-cli",
+      "name": "Gemini CLI",
+      "type": "cli-agent",
+      "description": "Google CLI harness optimized for large context and multimodal review tasks.",
+      "provider": "Google",
+      "status": "beta",
+      "website": "https://ai.google.dev",
+      "features": ["multimodal-input", "large-context", "repo-navigation", "automation"]
+    },
+    {
+      "id": "opencode",
+      "slug": "opencode",
+      "name": "OpenCode",
+      "type": "editor",
+      "description": "Community-built coding environment with model switching and MCP-friendly workflows.",
+      "provider": "Community",
+      "status": "active",
+      "website": "https://github.com/opencode-ai/opencode",
+      "features": ["mcp", "multi-model", "editor-ui", "community-plugins"]
+    },
+    {
+      "id": "openclaw",
+      "slug": "openclaw",
+      "name": "OpenClaw",
+      "type": "agent-runtime",
+      "description": "Composable runtime for autonomous agents with reusable skills and tool orchestration.",
+      "provider": "Community",
+      "status": "active",
+      "website": "https://github.com/openclaw/openclaw",
+      "features": ["skills", "tool-orchestration", "agent-loops", "multi-model"]
+    }
+  ],
+  "combos": [
+    {
+      "id": "claude-opus-4-claude-code",
+      "slug": "claude-opus-4-claude-code",
+      "model": "claude-opus-4",
+      "harness": "claude-code",
+      "name": "Claude Opus 4 + Claude Code",
+      "description": "Best fit for difficult repo surgery, multi-file refactors, and high-judgment engineering work.",
+      "score": 9.7,
+      "status": "recommended",
+      "notes": "Top choice when reasoning depth matters more than raw throughput.",
+      "usecase": "complex-development"
+    },
+    {
+      "id": "claude-sonnet-4-claude-code",
+      "slug": "claude-sonnet-4-claude-code",
+      "model": "claude-sonnet-4",
+      "harness": "claude-code",
+      "name": "Claude Sonnet 4 + Claude Code",
+      "description": "Fast default setup for day-to-day coding with strong repo awareness and reliable edits.",
+      "score": 9.4,
+      "status": "recommended",
+      "notes": "Best all-around option for active application development.",
+      "usecase": "general-development"
+    },
+    {
+      "id": "gpt-4.1-codex-cli",
+      "slug": "gpt-4.1-codex-cli",
+      "model": "gpt-4.1",
+      "harness": "codex-cli",
+      "name": "GPT-4.1 + Codex CLI",
+      "description": "Strong terminal workflow for implementation, explanation, and tight feedback loops.",
+      "score": 9.1,
+      "status": "recommended",
+      "notes": "Great for engineers who want a balanced CLI-first setup.",
+      "usecase": "cli-development"
+    },
+    {
+      "id": "gemini-2.5-pro-gemini-cli",
+      "slug": "gemini-2.5-pro-gemini-cli",
+      "model": "gemini-2.5-pro",
+      "harness": "gemini-cli",
+      "name": "Gemini 2.5 Pro + Gemini CLI",
+      "description": "Large-context pairing for codebase summarization, docs review, and multimodal analysis.",
+      "score": 8.9,
+      "status": "recommended",
+      "notes": "Useful when image or document context is part of the workflow.",
+      "usecase": "multimodal-analysis"
+    },
+    {
+      "id": "claude-opus-4-openclaw",
+      "slug": "claude-opus-4-openclaw",
+      "model": "claude-opus-4",
+      "harness": "openclaw",
+      "name": "Claude Opus 4 + OpenClaw",
+      "description": "Autonomous-agent pairing for complex orchestration, evaluation loops, and skill composition.",
+      "score": 9.3,
+      "status": "recommended",
+      "notes": "Best fit for agents that need deliberate planning plus reusable skills.",
+      "usecase": "agent-development"
+    },
+    {
+      "id": "claude-sonnet-4-opencode",
+      "slug": "claude-sonnet-4-opencode",
+      "model": "claude-sonnet-4",
+      "harness": "opencode",
+      "name": "Claude Sonnet 4 + OpenCode",
+      "description": "Solid open tooling stack for teams that want model flexibility and an editor-first workflow.",
+      "score": 8.1,
+      "status": "active",
+      "notes": "Good compromise when you want portability and community integrations.",
+      "usecase": "local-development"
+    },
+    {
+      "id": "gpt-4.1-openclaw",
+      "slug": "gpt-4.1-openclaw",
+      "model": "gpt-4.1",
+      "harness": "openclaw",
+      "name": "GPT-4.1 + OpenClaw",
+      "description": "Flexible agent stack that benefits from OpenClaw's orchestration and GPT-4.1's ecosystem fit.",
+      "score": 8.8,
+      "status": "active",
+      "notes": "Good fallback when teams standardize on OpenAI models.",
+      "usecase": "agent-development"
+    }
+  ],
+  "usecases": [
+    {
+      "id": "general-development",
+      "name": "General Development",
+      "description": "Balanced implementation, review, and refactoring across typical software projects."
+    },
+    {
+      "id": "complex-development",
+      "name": "Complex Development",
+      "description": "Hard multi-file engineering work where reasoning depth and planning matter."
+    },
+    {
+      "id": "cli-development",
+      "name": "CLI Development",
+      "description": "Terminal-first workflows focused on iteration speed and shell integration."
+    },
+    {
+      "id": "multimodal-analysis",
+      "name": "Multimodal Analysis",
+      "description": "Workflows involving screenshots, documents, diagrams, or mixed media context."
+    },
+    {
+      "id": "agent-development",
+      "name": "Agent Development",
+      "description": "Autonomous or semi-autonomous systems built around tools, skills, and orchestration."
+    },
+    {
+      "id": "local-development",
+      "name": "Local Development",
+      "description": "Portable, open, and customization-heavy setups for hands-on coding environments."
+    }
+  ]
+}

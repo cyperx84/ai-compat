@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { compatData, getHarness, getModel, getUsecase } from "../../data/compat";
+
+export function getStaticPaths() {
+  return compatData.combos.map((combo) => ({
+    params: { slug: combo.slug },
+    props: { combo },
+  }));
+}
+
+const { combo } = Astro.props;
+const model = getModel(combo.model);
+const harness = getHarness(combo.harness);
+const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
+---
+
+<Layout title={combo.name} description={combo.description}>
+  <a href="/combos" class="back-link">← combos</a>
+
+  <section class="detail-card">
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">Combo</span>
+        <h1>{combo.name}</h1>
+      </div>
+      <div class="detail-meta">
+        <span class="score-chip">{combo.score.toFixed(1)}</span>
+        <span class={`pill ${combo.status}`}>{combo.status}</span>
+      </div>
+    </div>
+    <p class="detail-copy">{combo.description}</p>
+    {combo.notes && <p class="detail-copy"><strong>Notes:</strong> {combo.notes}</p>}
+  </section>
+
+  <section class="grid cols-2" style="margin-top: 1rem;">
+    {model && (
+      <a class="list-card" href={`/models/${model.slug}`}>
+        <span class="eyebrow">Model</span>
+        <h2 style="margin-top: 0.4rem;">{model.name}</h2>
+        <p class="detail-copy">{model.description}</p>
+      </a>
+    )}
+
+    {harness && (
+      <a class="list-card" href={`/harnesses/${harness.slug}`}>
+        <span class="eyebrow">Harness</span>
+        <h2 style="margin-top: 0.4rem;">{harness.name}</h2>
+        <p class="detail-copy">{harness.description}</p>
+      </a>
+    )}
+  </section>
+
+  {usecase && (
+    <section class="section-card" style="margin-top: 1rem;">
+      <h2>Best for</h2>
+      <p class="detail-copy">
+        <strong>{usecase.name}.</strong> {usecase.description}
+      </p>
+    </section>
+  )}
+</Layout>

@@ -1,0 +1,30 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { compatData, getCombosForHarness } from "../../data/compat";
+---
+
+<Layout title="Harnesses" description="Browse harnesses included in the ai-compat dataset.">
+  <a href="/" class="back-link">← home</a>
+
+  <section class="detail-card">
+    <span class="eyebrow">Harnesses</span>
+    <h1>Harnesses</h1>
+    <p class="lede">CLI agents, editors, and runtimes scored against the same set of models.</p>
+  </section>
+
+  <section class="grid cols-2" style="margin-top: 1rem;">
+    {compatData.harnesses.map((harness) => (
+      <a class="list-card" href={`/harnesses/${harness.slug}`}>
+        <div class="list-head">
+          <strong>{harness.name}</strong>
+          <span class={`pill ${harness.status}`}>{harness.status}</span>
+        </div>
+        <p class="detail-copy">{harness.description}</p>
+        <div class="meta-row">
+          <span class="pill">{harness.type}</span>
+          <span class="pill">{getCombosForHarness(harness.slug).length} combos</span>
+        </div>
+      </a>
+    ))}
+  </section>
+</Layout>

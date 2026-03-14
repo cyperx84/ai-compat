@@ -1,0 +1,32 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getRecommendedCombos } from "../../data/compat";
+
+const combos = getRecommendedCombos(undefined, 100);
+---
+
+<Layout title="Combos" description="Browse model and harness combinations in the ai-compat dataset.">
+  <a href="/" class="back-link">← home</a>
+
+  <section class="detail-card">
+    <span class="eyebrow">Combos</span>
+    <h1>Combos</h1>
+    <p class="lede">Sorted by score so the best-fitting seeded stacks rise to the top.</p>
+  </section>
+
+  <section class="grid cols-2" style="margin-top: 1rem;">
+    {combos.map((combo) => (
+      <a class="list-card" href={`/combos/${combo.slug}`}>
+        <div class="list-head">
+          <strong>{combo.name}</strong>
+          <span class="score-chip">{combo.score.toFixed(1)}</span>
+        </div>
+        <p class="detail-copy">{combo.description}</p>
+        <div class="meta-row">
+          <span class={`pill ${combo.status}`}>{combo.status}</span>
+          {combo.usecaseDetails && <span class="pill">{combo.usecaseDetails.name}</span>}
+        </div>
+      </a>
+    ))}
+  </section>
+</Layout>

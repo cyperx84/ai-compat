@@ -1,43 +1,103 @@
-# Astro Starter Kit: Minimal
+# ai-compat.info
 
-```sh
-npm create astro@latest -- --template minimal
+`ai-compat.info` is a small compatibility matrix for AI models and coding harnesses.
+This repo ships one shared dataset that powers:
+
+- An Astro site
+- JSON API endpoints under `/api`
+- A Go CLI named `aicomp`
+- An OpenClaw skill scaffold at `skills/ai-compat/SKILL.md`
+
+## MVP surface
+
+Site routes:
+
+- `/`
+- `/matrix`
+- `/models/[slug]`
+- `/harnesses/[slug]`
+- `/combos/[slug]`
+
+JSON endpoints:
+
+- `/api/models.json`
+- `/api/harnesses.json`
+- `/api/combos.json`
+- `/api/recommend.json`
+
+## Shared data
+
+The source of truth is [`src/data/compat.json`](./src/data/compat.json).
+Astro imports it through [`src/data/compat.ts`](./src/data/compat.ts), and the Go CLI loads the same JSON file from disk.
+
+Seed data includes:
+
+- 4 models
+- 5 harnesses
+- 7 combos
+- 6 use cases
+
+## Local usage
+
+Install dependencies and run the site:
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Build the Astro site:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm run build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Build the CLI:
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+go build -o aicomp ./cmd/aicomp
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+Examples:
 
-## 🧞 Commands
+```bash
+./aicomp search claude
+./aicomp search agent --json
+./aicomp compare claude-opus-4 claude-sonnet-4
+./aicomp compare codex-cli openclaw --json
+./aicomp combo --model gpt-4.1 --harness codex-cli
+./aicomp best --for agent-development
+./aicomp best --for multimodal-analysis --json
+```
 
-All commands are run from the root of the project, from a terminal:
+Run tests:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+```bash
+go test ./...
+```
 
-## 👀 Want to learn more?
+## CLI commands
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+`aicomp search <query>`
+
+- Searches models, harnesses, and combos.
+- Supports `--json`.
+
+`aicomp compare <slugA> <slugB>`
+
+- Compares two models or two harnesses.
+- Supports `--json`.
+
+`aicomp combo --model <slug> --harness <slug>`
+
+- Returns one specific pairing.
+- Supports `--json`.
+
+`aicomp best --for <usecase>`
+
+- Returns top combos overall or for a specific use case.
+- Supports `--json`.
+
+## OpenClaw skill
+
+The scaffold at [`skills/ai-compat/SKILL.md`](./skills/ai-compat/SKILL.md) describes how an agent can use the CLI or JSON endpoints to search, compare, and recommend stacks.

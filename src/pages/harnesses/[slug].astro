@@ -1,0 +1,61 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { compatData, getCombosForHarness } from "../../data/compat";
+
+export function getStaticPaths() {
+  return compatData.harnesses.map((harness) => ({
+    params: { slug: harness.slug },
+    props: { harness },
+  }));
+}
+
+const { harness } = Astro.props;
+const combos = getCombosForHarness(harness.slug).sort((left, right) => right.score - left.score);
+---
+
+<Layout title={harness.name} description={harness.description}>
+  <a href="/harnesses" class="back-link">← harnesses</a>
+
+  <section class="detail-card">
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">{harness.provider}</span>
+        <h1>{harness.name}</h1>
+      </div>
+      <div class="detail-meta">
+        <span class="pill">{harness.type}</span>
+        <span class={`pill ${harness.status}`}>{harness.status}</span>
+      </div>
+    </div>
+    <p class="detail-copy">{harness.description}</p>
+    <div class="tag-row">
+      {harness.features.map((feature: string) => (
+        <span class="tag">{feature}</span>
+      ))}
+    </div>
+    {harness.website && (
+      <div class="button-row">
+        <a class="button" href={harness.website} target="_blank" rel="noreferrer">Harness website</a>
+      </div>
+    )}
+  </section>
+
+  <section class="section-card" style="margin-top: 1rem;">
+    <h2>Compatible models</h2>
+    <div class="grid" style="margin-top: 1rem;">
+      {combos.map((combo) => (
+        <a class="list-card" href={`/combos/${combo.slug}`}>
+          <div class="list-head">
+            <strong>{combo.name}</strong>
+            <span class="score-chip">{combo.score.toFixed(1)}</span>
+          </div>
+          <p class="detail-copy">{combo.description}</p>
+          <div class="meta-row">
+            <span class={`pill ${combo.status}`}>{combo.status}</span>
+            {combo.usecase && <span class="pill">{combo.usecase}</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

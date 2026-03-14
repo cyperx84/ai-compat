@@ -1,0 +1,61 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { compatData, getCombosForModel } from "../../data/compat";
+
+export function getStaticPaths() {
+  return compatData.models.map((model) => ({
+    params: { slug: model.slug },
+    props: { model },
+  }));
+}
+
+const { model } = Astro.props;
+const combos = getCombosForModel(model.slug).sort((left, right) => right.score - left.score);
+---
+
+<Layout title={model.name} description={model.description}>
+  <a href="/models" class="back-link">← models</a>
+
+  <section class="detail-card">
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">{model.provider}</span>
+        <h1>{model.name}</h1>
+      </div>
+      <div class="detail-meta">
+        {model.contextWindow && <span class="pill">{model.contextWindow}</span>}
+        {model.released && <span class="pill">{model.released}</span>}
+      </div>
+    </div>
+    <p class="detail-copy">{model.description}</p>
+    <div class="tag-row">
+      {model.capabilities.map((capability: string) => (
+        <span class="tag">{capability}</span>
+      ))}
+    </div>
+    {model.website && (
+      <div class="button-row">
+        <a class="button" href={model.website} target="_blank" rel="noreferrer">Provider website</a>
+      </div>
+    )}
+  </section>
+
+  <section class="section-card" style="margin-top: 1rem;">
+    <h2>Compatible harnesses</h2>
+    <div class="grid" style="margin-top: 1rem;">
+      {combos.map((combo) => (
+        <a class="list-card" href={`/combos/${combo.slug}`}>
+          <div class="list-head">
+            <strong>{combo.name}</strong>
+            <span class="score-chip">{combo.score.toFixed(1)}</span>
+          </div>
+          <p class="detail-copy">{combo.description}</p>
+          <div class="meta-row">
+            <span class={`pill ${combo.status}`}>{combo.status}</span>
+            {combo.usecase && <span class="pill">{combo.usecase}</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
