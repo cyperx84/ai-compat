@@ -1,148 +1,93 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import {
-  compatData,
-  getBestCombos,
-  getHarnessRankings,
-  getModelRankings,
-} from "../data/compat";
+import { getBestCombos } from "../data/compat";
 
-const featuredCombos = getBestCombos(undefined, 4);
-const topModels = getModelRankings().slice(0, 3);
-const topHarnesses = getHarnessRankings().slice(0, 3);
+const claudeCode = getBestCombos("claude-code", 3);
+const openclaw = getBestCombos("openclaw", 3);
+const budget = getBestCombos("budget", 2);
 ---
 
 <Layout
-  title="Model and Harness Compatibility"
-  description="Ranked compatibility data for AI models, coding harnesses, and recommended combinations."
+  title="What model for Claude Code & OpenClaw?"
+  description="Simple compatibility guide: which model should you run in Claude Code or OpenClaw?"
 >
   <section class="hero">
-    <span class="eyebrow">Claude Code & OpenClaw Compatibility</span>
-    <h1>Pick the right model for Claude Code or OpenClaw.</h1>
+    <h1>What model should I run?</h1>
     <p class="lede">
-      Which model should you run in Claude Code? What works best in OpenClaw?
-      This is a focused compatibility guide for real-world tool users — not a
-      generic model benchmark.
+      Claude Code or OpenClaw — pick your tool, see the best model for it.
+      Not a benchmark. Just practical recommendations.
     </p>
-    <div class="button-row" style="margin-top: 1.2rem;">
-      <a class="button" href="/best/claude-code">Best for Claude Code</a>
-      <a class="button" href="/best/openclaw">Best for OpenClaw</a>
-      <a class="button-ghost" href="/best/budget">Budget options</a>
-    </div>
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-value">{compatData.models.length}</div>
-        <div class="stat-label">Models</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">{compatData.harnesses.length}</div>
-        <div class="stat-label">Harnesses</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">{compatData.combos.length}</div>
-        <div class="stat-label">Ranked Combos</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">{compatData.usecases.length}</div>
-        <div class="stat-label">Use Cases</div>
-      </div>
-    </div>
   </section>
 
   <div class="section-stack">
-    <section class="grid cols-3">
-      <a class="feature-card" href="/best/claude-code">
-        <span class="eyebrow">Claude Code</span>
-        <h2>Best for Claude Code</h2>
-        <p>Top model picks for Claude Code terminal workflows.</p>
-      </a>
-      <a class="feature-card" href="/best/openclaw">
-        <span class="eyebrow">OpenClaw</span>
-        <h2>Best for OpenClaw</h2>
-        <p>Best models for autonomous agents and skills.</p>
-      </a>
-      <a class="feature-card" href="/best/budget">
-        <span class="eyebrow">Budget</span>
-        <h2>Best value stacks</h2>
-        <p>Good quality without premium pricing.</p>
-      </a>
-    </section>
-
     <section class="section-card">
       <div class="split-header">
         <div>
-          <span class="eyebrow">Featured Combos</span>
-          <h2>Highest scoring stacks right now</h2>
+          <h2>Best for Claude Code</h2>
+          <p class="detail-copy">Terminal coding, refactors, repo edits.</p>
         </div>
-        <a class="button-ghost" href="/combos">View all combos</a>
+        <a class="button" href="/best/claude-code">See all</a>
       </div>
-      <div class="grid cols-2" style="margin-top: 1rem;">
-        {featuredCombos.map((combo) => (
+      <div class="grid" style="margin-top: 1rem;">
+        {claudeCode.map((combo) => (
           <a class="list-card" href={`/combos/${combo.slug}`}>
             <div class="list-head">
-              <strong>{combo.name}</strong>
+              <strong>{combo.modelDetails?.name}</strong>
               <span class="score-chip">{combo.score.toFixed(1)}</span>
             </div>
-            <p class="detail-copy">{combo.description}</p>
+            <p class="detail-copy">{combo.notes}</p>
             <div class="meta-row">
               <span class={`pill ${combo.status}`}>{combo.status}</span>
-              {combo.usecaseDetails && <span class="pill">{combo.usecaseDetails.name}</span>}
-              {combo.modelDetails && <span class="pill">{combo.modelDetails.provider}</span>}
+              {combo.pros?.[0] && <span class="pill">{combo.pros[0]}</span>}
             </div>
           </a>
         ))}
       </div>
     </section>
 
-    <section class="grid cols-2">
-      <div class="section-card">
-        <div class="split-header">
-          <div>
-            <span class="eyebrow">Model Tiers</span>
-            <h2>Top models by aggregate pair quality</h2>
-          </div>
-          <a class="button-ghost" href="/tiers/models">See model tiers</a>
+    <section class="section-card">
+      <div class="split-header">
+        <div>
+          <h2>Best for OpenClaw</h2>
+          <p class="detail-copy">Autonomous agents, skills, orchestration.</p>
         </div>
-        <div class="grid" style="margin-top: 1rem;">
-          {topModels.map((entry) => (
-            <a class="list-card" href={`/models/${entry.item.slug}`}>
-              <div class="list-head">
-                <strong>{entry.item.name}</strong>
-                <span class={`tier-badge tier-${entry.tier.toLowerCase()}`}>{entry.tier}</span>
-              </div>
-              <p class="detail-copy">{entry.item.description}</p>
-              <div class="meta-row">
-                <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
-                <span class="pill">{entry.comboCount} combos</span>
-              </div>
-            </a>
-          ))}
-        </div>
+        <a class="button" href="/best/openclaw">See all</a>
       </div>
+      <div class="grid" style="margin-top: 1rem;">
+        {openclaw.map((combo) => (
+          <a class="list-card" href={`/combos/${combo.slug}`}>
+            <div class="list-head">
+              <strong>{combo.modelDetails?.name}</strong>
+              <span class="score-chip">{combo.score.toFixed(1)}</span>
+            </div>
+            <p class="detail-copy">{combo.notes}</p>
+            <div class="meta-row">
+              <span class={`pill ${combo.status}`}>{combo.status}</span>
+              {combo.pros?.[0] && <span class="pill">{combo.pros[0]}</span>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
 
-      <div class="section-card">
-        <div class="split-header">
-          <div>
-            <span class="eyebrow">Harness Tiers</span>
-            <h2>Top harnesses across the matrix</h2>
-          </div>
-          <a class="button-ghost" href="/tiers/harnesses">See harness tiers</a>
+    <section class="section-card">
+      <div class="split-header">
+        <div>
+          <h2>Best on a Budget</h2>
+          <p class="detail-copy">Good quality, cheaper models.</p>
         </div>
-        <div class="grid" style="margin-top: 1rem;">
-          {topHarnesses.map((entry) => (
-            <a class="list-card" href={`/harnesses/${entry.item.slug}`}>
-              <div class="list-head">
-                <strong>{entry.item.name}</strong>
-                <span class={`tier-badge tier-${entry.tier.toLowerCase()}`}>{entry.tier}</span>
-              </div>
-              <p class="detail-copy">{entry.item.description}</p>
-              <div class="meta-row">
-                <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
-                <span class="pill">{entry.comboCount} combos</span>
-              </div>
-            </a>
-          ))}
-        </div>
+        <a class="button-ghost" href="/best/budget">See all</a>
+      </div>
+      <div class="grid cols-2" style="margin-top: 1rem;">
+        {budget.map((combo) => (
+          <a class="list-card" href={`/combos/${combo.slug}`}>
+            <div class="list-head">
+              <strong>{combo.name}</strong>
+              <span class="score-chip">{combo.score.toFixed(1)}</span>
+            </div>
+            <p class="detail-copy">{combo.notes}</p>
+          </a>
+        ))}
       </div>
     </section>
   </div>

@@ -13,57 +13,39 @@ const usecase = getUsecase(usecaseId ?? "");
 const combos = getBestCombos(usecaseId, 8);
 ---
 
-<Layout title={usecase?.name ?? "Best for"} description={usecase?.description}>
-  <a href="/best" class="back-link">← best</a>
+<Layout title={`Best for ${usecase?.name ?? usecaseId}`} description={usecase?.description}>
+  <a href="/" class="back-link">← home</a>
 
   <section class="detail-card">
-    <div class="detail-header">
-      <div>
-        <span class="eyebrow">Best For</span>
-        <h1>{usecase?.name ?? "Recommendations"}</h1>
-      </div>
-      <div class="button-row">
-        <a class="button-ghost" href={`/api/best/${usecaseId}.json`}>JSON</a>
-        <a class="button-ghost" href="/combos">All combos</a>
-      </div>
-    </div>
-    {usecase && <p class="lede">{usecase.description}</p>}
+    <h1>Best for {usecase?.name}</h1>
+    <p class="lede">{usecase?.description}</p>
   </section>
 
-  <section class="section-card" style="margin-top: 1rem;">
-    <h2>Ranked combos</h2>
-    <div class="grid cols-2" style="margin-top: 1rem;">
-      {combos.map((combo, index) => (
-        <a class="list-card" href={`/combos/${combo.slug}`}>
-          <div class="list-head">
-            <strong>
-              #{index + 1} {combo.name}
-            </strong>
-            <span class="score-chip">{combo.score.toFixed(1)}</span>
+  <div class="section-stack" style="margin-top: 1rem;">
+    {combos.map((combo, index) => (
+      <a class="list-card" href={`/combos/${combo.slug}`}>
+        <div class="list-head">
+          <strong>#{index + 1} {combo.modelDetails?.name}</strong>
+          <span class="score-chip">{combo.score.toFixed(1)}</span>
+        </div>
+        <p class="detail-copy">{combo.notes}</p>
+        {combo.pros && combo.pros.length > 0 && (
+          <div class="meta-row" style="margin-top: 0.6rem;">
+            <span class="eyebrow" style="margin-right: 0.5rem;">Pros</span>
+            {combo.pros.map(p => <span class="pill">{p}</span>)}
           </div>
-          <p class="detail-copy">{combo.description}</p>
-          {combo.notes && <p class="detail-copy"><strong>Why it fits:</strong> {combo.notes}</p>}
-          <div class="grid" style="margin-top: 1rem; gap: 0.7rem;">
-            {combo.pros && combo.pros.length > 0 && (
-              <div>
-                <span class="eyebrow">Pros</span>
-                <p>{combo.pros.join(" • ")}</p>
-              </div>
-            )}
-            {combo.cons && combo.cons.length > 0 && (
-              <div>
-                <span class="eyebrow">Cons</span>
-                <p>{combo.cons.join(" • ")}</p>
-              </div>
-            )}
-          </div>
+        )}
+        {combo.cons && combo.cons.length > 0 && (
           <div class="meta-row">
-            <span class={`pill ${combo.status}`}>{combo.status}</span>
-            {combo.modelDetails && <span class="pill">{combo.modelDetails.name}</span>}
-            {combo.harnessDetails && <span class="pill">{combo.harnessDetails.name}</span>}
+            <span class="eyebrow" style="margin-right: 0.5rem;">Cons</span>
+            {combo.cons.map(c => <span class="pill">{c}</span>)}
           </div>
-        </a>
-      ))}
-    </div>
-  </section>
+        )}
+        <div class="meta-row">
+          <span class={`pill ${combo.status}`}>{combo.status}</span>
+          <span class="pill">{combo.harnessDetails?.name}</span>
+        </div>
+      </a>
+    ))}
+  </div>
 </Layout>
