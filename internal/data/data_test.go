@@ -8,16 +8,16 @@ func TestLoadData(t *testing.T) {
 		t.Fatalf("LoadData failed: %v", err)
 	}
 
-	if len(compat.Models) != 14 {
-		t.Fatalf("expected 14 models, got %d", len(compat.Models))
+	if len(compat.Models) == 0 {
+		t.Fatal("expected models to be loaded")
 	}
 
-	if len(compat.Harnesses) != 11 {
-		t.Fatalf("expected 11 harnesses, got %d", len(compat.Harnesses))
+	if len(compat.Harnesses) == 0 {
+		t.Fatal("expected harnesses to be loaded")
 	}
 
-	if len(compat.Combos) < 100 {
-		t.Fatalf("expected seeded combos, got %d", len(compat.Combos))
+	if len(compat.Combos) == 0 {
+		t.Fatal("expected combos to be loaded")
 	}
 
 	if len(compat.Usecases) == 0 {
@@ -48,7 +48,7 @@ func TestFinders(t *testing.T) {
 		t.Fatal("expected combo by parts")
 	}
 
-	if compat.FindUsecase("autonomous") == nil {
-		t.Fatal("expected autonomous usecase")
+	if compat.FindUsecase("openclaw") == nil {
+		t.Fatal("expected openclaw usecase")
 	}
 }

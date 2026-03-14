@@ -17,18 +17,17 @@ const topHarnesses = getHarnessRankings().slice(0, 3);
   description="Ranked compatibility data for AI models, coding harnesses, and recommended combinations."
 >
   <section class="hero">
-    <span class="eyebrow">Ranked AI Tooling Compatibility</span>
-    <h1>Find the right model and harness pair for the way you actually work.</h1>
+    <span class="eyebrow">Claude Code & OpenClaw Compatibility</span>
+    <h1>Pick the right model for Claude Code or OpenClaw.</h1>
     <p class="lede">
-      `ai-compat.info` tracks realistic pairings across coding, research,
-      autonomous, local-first, and budget-driven workflows. The same dataset
-      powers this site, JSON endpoints, the `aicomp` CLI, and agent-facing
-      skills.
+      Which model should you run in Claude Code? What works best in OpenClaw?
+      This is a focused compatibility guide for real-world tool users — not a
+      generic model benchmark.
     </p>
     <div class="button-row" style="margin-top: 1.2rem;">
-      <a class="button" href="/tiers/models">Model tiers</a>
-      <a class="button-ghost" href="/best/coding">Best for coding</a>
-      <a class="button-ghost" href="/docs">API + CLI docs</a>
+      <a class="button" href="/best/claude-code">Best for Claude Code</a>
+      <a class="button" href="/best/openclaw">Best for OpenClaw</a>
+      <a class="button-ghost" href="/best/budget">Budget options</a>
     </div>
     <div class="stats">
       <div class="stat">
@@ -52,20 +51,20 @@ const topHarnesses = getHarnessRankings().slice(0, 3);
 
   <div class="section-stack">
     <section class="grid cols-3">
-      <a class="feature-card" href="/matrix">
-        <span class="eyebrow">Matrix</span>
-        <h2>Compare the whole field</h2>
-        <p>Browse a full model-by-harness matrix and drill into each pairing.</p>
+      <a class="feature-card" href="/best/claude-code">
+        <span class="eyebrow">Claude Code</span>
+        <h2>Best for Claude Code</h2>
+        <p>Top model picks for Claude Code terminal workflows.</p>
       </a>
-      <a class="feature-card" href="/tiers">
-        <span class="eyebrow">Tiers</span>
-        <h2>See the aggregate leaders</h2>
-        <p>Grouped S/A/B/C rankings for both models and harnesses.</p>
+      <a class="feature-card" href="/best/openclaw">
+        <span class="eyebrow">OpenClaw</span>
+        <h2>Best for OpenClaw</h2>
+        <p>Best models for autonomous agents and skills.</p>
       </a>
-      <a class="feature-card" href="/best">
-        <span class="eyebrow">Best For</span>
-        <h2>Pick by workflow, not hype</h2>
-        <p>Get ranked recommendations with pros, cons, and why they fit.</p>
+      <a class="feature-card" href="/best/budget">
+        <span class="eyebrow">Budget</span>
+        <h2>Best value stacks</h2>
+        <p>Good quality without premium pricing.</p>
       </a>
     </section>
 

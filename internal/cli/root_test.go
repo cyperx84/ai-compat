@@ -21,7 +21,7 @@ func executeRoot(t *testing.T, args ...string) (string, error) {
 }
 
 func TestSearchJSON(t *testing.T) {
-	out, err := executeRoot(t, "search", "agent", "--json")
+	out, err := executeRoot(t, "search", "claude", "--json")
 	if err != nil {
 		t.Fatalf("search failed: %v", err)
 	}
@@ -64,12 +64,12 @@ func TestComboJSON(t *testing.T) {
 }
 
 func TestBestForUsecase(t *testing.T) {
-	out, err := executeRoot(t, "best", "--for", "autonomous")
+	out, err := executeRoot(t, "best", "--for", "openclaw")
 	if err != nil {
 		t.Fatalf("best failed: %v", err)
 	}
 
-	if !strings.Contains(out, "Top combos for autonomous") {
+	if !strings.Contains(out, "Top combos for openclaw") {
 		t.Fatalf("unexpected best output: %s", out)
 	}
 }
