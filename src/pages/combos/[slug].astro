@@ -1,6 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { compatData, getHarness, getModel, getUsecase } from "../../data/compat";
+import {
+  compatData,
+  getHarness,
+  getModel,
+  getUsecasesForCombo,
+} from "../../data/compat";
 
 export function getStaticPaths() {
   return compatData.combos.map((combo) => ({
@@ -12,7 +17,7 @@ export function getStaticPaths() {
 const { combo } = Astro.props;
 const model = getModel(combo.model);
 const harness = getHarness(combo.harness);
-const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
+const usecases = getUsecasesForCombo(combo);
 ---
 
 <Layout title={combo.name} description={combo.description}>
@@ -21,7 +26,7 @@ const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
   <section class="detail-card">
     <div class="detail-header">
       <div>
-        <span class="eyebrow">Combo</span>
+        <span class="eyebrow">Combo Detail</span>
         <h1>{combo.name}</h1>
       </div>
       <div class="detail-meta">
@@ -29,8 +34,13 @@ const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
         <span class={`pill ${combo.status}`}>{combo.status}</span>
       </div>
     </div>
-    <p class="detail-copy">{combo.description}</p>
-    {combo.notes && <p class="detail-copy"><strong>Notes:</strong> {combo.notes}</p>}
+    <p class="lede">{combo.description}</p>
+    {combo.notes && <p class="detail-copy"><strong>Why it works:</strong> {combo.notes}</p>}
+    <div class="meta-row" style="margin-top: 1rem;">
+      {usecases.map((usecase) => (
+        <span class="pill">{usecase.name}</span>
+      ))}
+    </div>
   </section>
 
   <section class="grid cols-2" style="margin-top: 1rem;">
@@ -39,6 +49,10 @@ const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
         <span class="eyebrow">Model</span>
         <h2 style="margin-top: 0.4rem;">{model.name}</h2>
         <p class="detail-copy">{model.description}</p>
+        <div class="meta-row">
+          <span class="pill">{model.provider}</span>
+          {model.contextWindow && <span class="pill">{model.contextWindow}</span>}
+        </div>
       </a>
     )}
 
@@ -47,16 +61,34 @@ const usecase = combo.usecase ? getUsecase(combo.usecase) : undefined;
         <span class="eyebrow">Harness</span>
         <h2 style="margin-top: 0.4rem;">{harness.name}</h2>
         <p class="detail-copy">{harness.description}</p>
+        <div class="meta-row">
+          <span class="pill">{harness.provider}</span>
+          <span class={`pill ${harness.status}`}>{harness.status}</span>
+        </div>
       </a>
     )}
   </section>
 
-  {usecase && (
-    <section class="section-card" style="margin-top: 1rem;">
-      <h2>Best for</h2>
-      <p class="detail-copy">
-        <strong>{usecase.name}.</strong> {usecase.description}
-      </p>
-    </section>
-  )}
+  <section class="grid cols-2" style="margin-top: 1rem;">
+    <div class="section-card">
+      <span class="eyebrow">Pros</span>
+      <div class="prose" style="margin-top: 0.8rem;">
+        <ul>
+          {(combo.pros ?? []).map((pro: string) => (
+            <li>{pro}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div class="section-card">
+      <span class="eyebrow">Cons</span>
+      <div class="prose" style="margin-top: 0.8rem;">
+        <ul>
+          {(combo.cons ?? []).map((con: string) => (
+            <li>{con}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
 </Layout>

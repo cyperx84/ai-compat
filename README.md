@@ -1,52 +1,75 @@
 # ai-compat.info
 
-`ai-compat.info` is a small compatibility matrix for AI models and coding harnesses.
-This repo ships one shared dataset that powers:
+`ai-compat.info` is a shared compatibility dataset and reference app for AI
+models, coding harnesses, and real workflow recommendations.
 
-- An Astro site
+One source of truth in [`src/data/compat.json`](./src/data/compat.json) powers:
+
+- The Astro site
 - JSON API endpoints under `/api`
-- A Go CLI named `aicomp`
-- An OpenClaw skill scaffold at `skills/ai-compat/SKILL.md`
+- The Go CLI `aicomp`
+- The agent skill scaffold at [`skills/ai-compat/SKILL.md`](./skills/ai-compat/SKILL.md)
 
-## MVP surface
+Live site: `https://ai-compat.info`
 
-Site routes:
+## Features
+
+- Model, harness, and combo detail pages
+- Full compatibility matrix across all seeded pairings
+- Tier lists for models and harnesses with S/A/B/C grouping
+- Best-for pages for coding, research, autonomous, local-first, and budget workflows
+- Shared JSON API for site and tool consumers
+- Go CLI for search, compare, combo lookup, recommendations, and tiers
+- One shared dataset used everywhere
+
+## Routes
+
+Site pages:
 
 - `/`
 - `/matrix`
+- `/models`
 - `/models/[slug]`
+- `/harnesses`
 - `/harnesses/[slug]`
+- `/combos`
 - `/combos/[slug]`
+- `/tiers`
+- `/tiers/models`
+- `/tiers/harnesses`
+- `/best`
+- `/best/coding`
+- `/best/research`
+- `/best/autonomous`
+- `/best/local`
+- `/best/budget`
+- `/docs`
+- `/about`
 
-JSON endpoints:
+API endpoints:
 
 - `/api/models.json`
 - `/api/harnesses.json`
 - `/api/combos.json`
 - `/api/recommend.json`
+- `/api/tiers/models.json`
+- `/api/tiers/harnesses.json`
+- `/api/best/coding.json`
+- `/api/best/research.json`
+- `/api/best/autonomous.json`
+- `/api/best/local.json`
+- `/api/best/budget.json`
 
-## Shared data
+## Local Development
 
-The source of truth is [`src/data/compat.json`](./src/data/compat.json).
-Astro imports it through [`src/data/compat.ts`](./src/data/compat.ts), and the Go CLI loads the same JSON file from disk.
-
-Seed data includes:
-
-- 4 models
-- 5 harnesses
-- 7 combos
-- 6 use cases
-
-## Local usage
-
-Install dependencies and run the site:
+Install dependencies and run the Astro app:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Build the Astro site:
+Build the site:
 
 ```bash
 npm run build
@@ -58,46 +81,139 @@ Build the CLI:
 go build -o aicomp ./cmd/aicomp
 ```
 
-Examples:
-
-```bash
-./aicomp search claude
-./aicomp search agent --json
-./aicomp compare claude-opus-4 claude-sonnet-4
-./aicomp compare codex-cli openclaw --json
-./aicomp combo --model gpt-4.1 --harness codex-cli
-./aicomp best --for agent-development
-./aicomp best --for multimodal-analysis --json
-```
-
 Run tests:
 
 ```bash
 go test ./...
 ```
 
-## CLI commands
+## CLI
 
-`aicomp search <query>`
+Search:
 
-- Searches models, harnesses, and combos.
-- Supports `--json`.
+```bash
+./aicomp search claude
+./aicomp search local --json
+```
 
-`aicomp compare <slugA> <slugB>`
+Compare models or harnesses:
 
-- Compares two models or two harnesses.
-- Supports `--json`.
+```bash
+./aicomp compare claude-opus-4 gpt-4.1
+./aicomp compare claude-code aider --json
+```
 
-`aicomp combo --model <slug> --harness <slug>`
+Inspect a specific combo:
 
-- Returns one specific pairing.
-- Supports `--json`.
+```bash
+./aicomp combo --model gpt-4.1 --harness codex-cli
+./aicomp combo --model deepseek-v3 --harness continue --json
+```
 
-`aicomp best --for <usecase>`
+Get best recommendations:
 
-- Returns top combos overall or for a specific use case.
-- Supports `--json`.
+```bash
+./aicomp best --for coding
+./aicomp best --for research --json
+./aicomp best --for autonomous
+./aicomp best --for local
+./aicomp best --for budget
+```
 
-## OpenClaw skill
+View tier lists:
 
-The scaffold at [`skills/ai-compat/SKILL.md`](./skills/ai-compat/SKILL.md) describes how an agent can use the CLI or JSON endpoints to search, compare, and recommend stacks.
+```bash
+./aicomp tiers models
+./aicomp tiers models --json
+./aicomp tiers harnesses
+./aicomp tiers harnesses --json
+```
+
+Command summary:
+
+- `aicomp search <query> [--json]`
+- `aicomp compare <slugA> <slugB> [--json]`
+- `aicomp combo --model <slug> --harness <slug> [--json]`
+- `aicomp best [--for coding|research|autonomous|local|budget] [--json]`
+- `aicomp tiers models [--json]`
+- `aicomp tiers harnesses [--json]`
+
+## API
+
+Fetch models:
+
+```bash
+curl http://localhost:4321/api/models.json
+```
+
+Fetch harnesses:
+
+```bash
+curl http://localhost:4321/api/harnesses.json
+```
+
+Fetch all combos:
+
+```bash
+curl http://localhost:4321/api/combos.json
+```
+
+Fetch recommendations:
+
+```bash
+curl "http://localhost:4321/api/recommend.json?usecase=coding&limit=5"
+```
+
+Fetch model tiers:
+
+```bash
+curl http://localhost:4321/api/tiers/models.json
+```
+
+Fetch harness tiers:
+
+```bash
+curl http://localhost:4321/api/tiers/harnesses.json
+```
+
+Fetch best-for pages as JSON:
+
+```bash
+curl http://localhost:4321/api/best/coding.json
+curl http://localhost:4321/api/best/research.json
+curl http://localhost:4321/api/best/autonomous.json
+curl http://localhost:4321/api/best/local.json
+curl http://localhost:4321/api/best/budget.json
+```
+
+## Contributing Data
+
+The source of truth is [`src/data/compat.json`](./src/data/compat.json).
+
+When contributing:
+
+1. Keep slugs stable and lowercase.
+2. Update models, harnesses, combos, and use cases in the same file.
+3. Keep scores realistic relative to the rest of the matrix.
+4. Include practical descriptions, notes, and pros/cons.
+5. Run `npm run build` and `go test ./...` before opening a PR.
+
+## Deploy
+
+The site is a standard Astro static build.
+
+1. Install dependencies with `npm install`.
+2. Run `npm run build`.
+3. Deploy the `dist/` directory to any static host.
+4. Build the CLI separately with `go build -o aicomp ./cmd/aicomp` if you want binaries.
+
+## Skill Usage
+
+The skill scaffold in [`skills/ai-compat/SKILL.md`](./skills/ai-compat/SKILL.md)
+describes how an agent can use the CLI and API to:
+
+- Search the dataset
+- Compare models or harnesses
+- Inspect a specific pairing
+- Fetch recommendations by workflow
+- Use the same compatibility knowledge from outside the website

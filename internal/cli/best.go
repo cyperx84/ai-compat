@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/cyperx/ai-compat/internal/data"
 	"github.com/spf13/cobra"
@@ -33,32 +32,18 @@ func NewBestCommand() *cobra.Command {
 				return err
 			}
 
-			var matches []data.Combo
-			for _, combo := range compat.Combos {
-				if usecase == "" || combo.Usecase == usecase {
-					matches = append(matches, combo)
-				}
-			}
+			matches := compat.BestCombos(usecase, 5)
 
 			if len(matches) == 0 {
 				return fmt.Errorf("no combos found for use case %q", usecase)
 			}
 
-			sort.Slice(matches, func(i, j int) bool {
-				return matches[i].Score > matches[j].Score
-			})
-
-			limit := 5
-			if len(matches) < limit {
-				limit = len(matches)
-			}
-
 			payload := bestPayload{
 				For:    usecase,
-				Combos: make([]bestCombo, 0, limit),
+				Combos: make([]bestCombo, 0, len(matches)),
 			}
 
-			for _, combo := range matches[:limit] {
+			for _, combo := range matches {
 				item := bestCombo{
 					Combo:   combo,
 					Model:   compat.FindModel(combo.Model),
@@ -83,6 +68,9 @@ func NewBestCommand() *cobra.Command {
 				writeLine(cmd.OutOrStdout(), "%d. %s (%.1f)", index+1, item.Combo.Name, item.Combo.Score)
 				if item.Usecase != nil {
 					writeLine(cmd.OutOrStdout(), "   %s", item.Usecase.Name)
+				}
+				if len(item.Combo.Pros) > 0 {
+					writeLine(cmd.OutOrStdout(), "   Pros: %s", joinList(item.Combo.Pros))
 				}
 				if item.Combo.Notes != "" {
 					writeLine(cmd.OutOrStdout(), "   %s", item.Combo.Notes)

@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { compatData, getCombosForHarness } from "../../data/compat";
+import { compatData, getCombosForHarness, getTierForScore, getUsecasesForCombo } from "../../data/compat";
 
 export function getStaticPaths() {
   return compatData.harnesses.map((harness) => ({
@@ -11,6 +11,9 @@ export function getStaticPaths() {
 
 const { harness } = Astro.props;
 const combos = getCombosForHarness(harness.slug).sort((left, right) => right.score - left.score);
+const aggregateScore =
+  combos.reduce((sum, combo) => sum + combo.score, 0) / Math.max(combos.length, 1);
+const tier = getTierForScore(aggregateScore);
 ---
 
 <Layout title={harness.name} description={harness.description}>
@@ -23,25 +26,30 @@ const combos = getCombosForHarness(harness.slug).sort((left, right) => right.sco
         <h1>{harness.name}</h1>
       </div>
       <div class="detail-meta">
+        <span class={`tier-badge tier-${tier.toLowerCase()}`}>{tier}</span>
         <span class="pill">{harness.type}</span>
         <span class={`pill ${harness.status}`}>{harness.status}</span>
       </div>
     </div>
-    <p class="detail-copy">{harness.description}</p>
+    <p class="lede">{harness.description}</p>
+    <div class="meta-row" style="margin-top: 1rem;">
+      <span class="score-chip">{aggregateScore.toFixed(1)} avg</span>
+      <span class="pill">{combos.length} combos scored</span>
+    </div>
     <div class="tag-row">
       {harness.features.map((feature: string) => (
         <span class="tag">{feature}</span>
       ))}
     </div>
     {harness.website && (
-      <div class="button-row">
-        <a class="button" href={harness.website} target="_blank" rel="noreferrer">Harness website</a>
+      <div class="button-row" style="margin-top: 1rem;">
+        <a class="button-ghost" href={harness.website} target="_blank" rel="noreferrer">Harness website</a>
       </div>
     )}
   </section>
 
   <section class="section-card" style="margin-top: 1rem;">
-    <h2>Compatible models</h2>
+    <h2>Best model pairings</h2>
     <div class="grid" style="margin-top: 1rem;">
       {combos.map((combo) => (
         <a class="list-card" href={`/combos/${combo.slug}`}>
@@ -52,7 +60,9 @@ const combos = getCombosForHarness(harness.slug).sort((left, right) => right.sco
           <p class="detail-copy">{combo.description}</p>
           <div class="meta-row">
             <span class={`pill ${combo.status}`}>{combo.status}</span>
-            {combo.usecase && <span class="pill">{combo.usecase}</span>}
+            {getUsecasesForCombo(combo).slice(0, 3).map((usecase) => (
+              <span class="pill">{usecase.name}</span>
+            ))}
           </div>
         </a>
       ))}

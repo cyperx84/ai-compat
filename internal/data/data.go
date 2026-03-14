@@ -33,16 +33,19 @@ type Harness struct {
 }
 
 type Combo struct {
-	ID          string  `json:"id"`
-	Slug        string  `json:"slug"`
-	Model       string  `json:"model"`
-	Harness     string  `json:"harness"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Score       float64 `json:"score"`
-	Status      string  `json:"status"`
-	Notes       string  `json:"notes,omitempty"`
-	Usecase     string  `json:"usecase,omitempty"`
+	ID          string   `json:"id"`
+	Slug        string   `json:"slug"`
+	Model       string   `json:"model"`
+	Harness     string   `json:"harness"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Score       float64  `json:"score"`
+	Status      string   `json:"status"`
+	Notes       string   `json:"notes,omitempty"`
+	Usecase     string   `json:"usecase,omitempty"`
+	Usecases    []string `json:"usecases,omitempty"`
+	Pros        []string `json:"pros,omitempty"`
+	Cons        []string `json:"cons,omitempty"`
 }
 
 type Usecase struct {

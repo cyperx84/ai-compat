@@ -1,28 +1,40 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { compatData, getCombosForHarness } from "../../data/compat";
+import { getCombosForHarness, getHarnessRankings } from "../../data/compat";
+
+const rankings = getHarnessRankings();
 ---
 
-<Layout title="Harnesses" description="Browse harnesses included in the ai-compat dataset.">
+<Layout title="Harnesses" description="Browse ranked harnesses in the ai-compat dataset.">
   <a href="/" class="back-link">← home</a>
 
   <section class="detail-card">
-    <span class="eyebrow">Harnesses</span>
-    <h1>Harnesses</h1>
-    <p class="lede">CLI agents, editors, and runtimes scored against the same set of models.</p>
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">Harnesses</span>
+        <h1>Harnesses</h1>
+      </div>
+      <a class="button-ghost" href="/tiers/harnesses">Tier list</a>
+    </div>
+    <p class="lede">
+      CLI agents, IDEs, and agent runtimes ranked by aggregate pair quality
+      across the shared matrix.
+    </p>
   </section>
 
   <section class="grid cols-2" style="margin-top: 1rem;">
-    {compatData.harnesses.map((harness) => (
-      <a class="list-card" href={`/harnesses/${harness.slug}`}>
+    {rankings.map((entry) => (
+      <a class="list-card" href={`/harnesses/${entry.item.slug}`}>
         <div class="list-head">
-          <strong>{harness.name}</strong>
-          <span class={`pill ${harness.status}`}>{harness.status}</span>
+          <strong>{entry.item.name}</strong>
+          <span class={`tier-badge tier-${entry.tier.toLowerCase()}`}>{entry.tier}</span>
         </div>
-        <p class="detail-copy">{harness.description}</p>
+        <p class="detail-copy">{entry.item.description}</p>
         <div class="meta-row">
-          <span class="pill">{harness.type}</span>
-          <span class="pill">{getCombosForHarness(harness.slug).length} combos</span>
+          <span class={`pill ${entry.item.status}`}>{entry.item.status}</span>
+          <span class="pill">{entry.item.type}</span>
+          <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
+          <span class="pill">{getCombosForHarness(entry.item.slug).length} combos</span>
         </div>
       </a>
     ))}

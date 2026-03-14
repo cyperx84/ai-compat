@@ -64,12 +64,28 @@ func TestComboJSON(t *testing.T) {
 }
 
 func TestBestForUsecase(t *testing.T) {
-	out, err := executeRoot(t, "best", "--for", "agent-development")
+	out, err := executeRoot(t, "best", "--for", "autonomous")
 	if err != nil {
 		t.Fatalf("best failed: %v", err)
 	}
 
-	if !strings.Contains(out, "Top combos for agent-development") {
+	if !strings.Contains(out, "Top combos for autonomous") {
 		t.Fatalf("unexpected best output: %s", out)
+	}
+}
+
+func TestTiersModelsJSON(t *testing.T) {
+	out, err := executeRoot(t, "tiers", "models", "--json")
+	if err != nil {
+		t.Fatalf("tiers models failed: %v", err)
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal([]byte(out), &payload); err != nil {
+		t.Fatalf("invalid json output: %v", err)
+	}
+
+	if payload["kind"] != "models" {
+		t.Fatalf("unexpected payload: %v", payload)
 	}
 }

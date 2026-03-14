@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { getBestCombos } from "../../data/compat";
+import { getHarnessRankings } from "../../../data/compat";
 
 export const GET: APIRoute = async () =>
-  new Response(JSON.stringify(getBestCombos(undefined, 200), null, 2), {
+  new Response(JSON.stringify(getHarnessRankings(), null, 2), {
     headers: { "content-type": "application/json; charset=utf-8" },
   });

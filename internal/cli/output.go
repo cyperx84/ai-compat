@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 )
 
 func writeJSON(w io.Writer, value any) error {
@@ -14,4 +15,8 @@ func writeJSON(w io.Writer, value any) error {
 
 func writeLine(w io.Writer, format string, args ...any) {
 	fmt.Fprintf(w, format+"\n", args...)
+}
+
+func joinList(values []string) string {
+	return strings.Join(values, ", ")
 }

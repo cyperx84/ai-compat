@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
-import { getRecommendedCombos } from "../../data/compat";
+import { getBestCombos } from "../../data/compat";
 
 export const GET: APIRoute = async ({ url }) => {
   const usecase = url.searchParams.get("usecase") ?? undefined;
-  const recommendations = getRecommendedCombos(usecase, 5);
+  const limit = Number(url.searchParams.get("limit") ?? "5");
+  const recommendations = getBestCombos(usecase, Number.isNaN(limit) ? 5 : limit);
 
   return new Response(
     JSON.stringify(

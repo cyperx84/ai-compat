@@ -1,0 +1,75 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getHarnessRankings, getModelRankings, getTierGroups } from "../../data/compat";
+
+export function getStaticPaths() {
+  return [
+    { params: { kind: "models" } },
+    { params: { kind: "harnesses" } },
+  ];
+}
+
+const { kind } = Astro.params;
+const isModels = kind === "models";
+const title = isModels ? "Model tiers" : "Harness tiers";
+const entries = isModels ? getModelRankings() : getHarnessRankings();
+const groups = getTierGroups(entries);
+---
+
+<Layout title={title} description={`S/A/B/C tier list for ${kind}.`}>
+  <a href="/tiers" class="back-link">← tiers</a>
+
+  <section class="detail-card">
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">{isModels ? "Models" : "Harnesses"}</span>
+        <h1>{title}</h1>
+      </div>
+      <div class="tier-summary">
+        <a class="button-ghost" href={`/api/tiers/${kind}.json`}>JSON</a>
+        <a class="button-ghost" href={isModels ? "/models" : "/harnesses"}>
+          Browse details
+        </a>
+      </div>
+    </div>
+    <p class="lede">
+      Aggregates are the average combo score for each {isModels ? "model" : "harness"} across
+      the full seeded matrix.
+    </p>
+  </section>
+
+  <div class="section-stack" style="margin-top: 1rem;">
+    {groups.map((group) =>
+      group.items.length > 0 && (
+        <section class="tier-section">
+          <div class="split-header">
+            <div>
+              <span class={`tier-badge tier-${group.tier.toLowerCase()}`}>{group.tier}</span>
+              <h2 style="margin-top: 0.7rem;">{group.label}</h2>
+              <p>{group.description}</p>
+            </div>
+            <div class="table-meta">{group.items.length} entries</div>
+          </div>
+          <div class="grid cols-2" style="margin-top: 1rem;">
+            {group.items.map((entry) => (
+              <a
+                class="list-card"
+                href={`/${isModels ? "models" : "harnesses"}/${entry.item.slug}`}
+              >
+                <div class="list-head">
+                  <strong>{entry.item.name}</strong>
+                  <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
+                </div>
+                <p class="detail-copy">{entry.item.description}</p>
+                <div class="meta-row">
+                  <span class="pill">{entry.comboCount} combos</span>
+                  {entry.bestCombo && <span class="pill">{entry.bestCombo.name}</span>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ),
+    )}
+  </div>
+</Layout>

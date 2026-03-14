@@ -124,9 +124,19 @@ func matchesHarness(harness data.Harness, query string) bool {
 }
 
 func matchesCombo(combo data.Combo, query string) bool {
-	return strings.Contains(strings.ToLower(combo.Name), query) ||
+	if strings.Contains(strings.ToLower(combo.Name), query) ||
 		strings.Contains(strings.ToLower(combo.Description), query) ||
 		strings.Contains(strings.ToLower(combo.Slug), query) ||
 		strings.Contains(strings.ToLower(combo.Notes), query) ||
-		strings.Contains(strings.ToLower(combo.Usecase), query)
+		strings.Contains(strings.ToLower(combo.Usecase), query) {
+		return true
+	}
+
+	for _, usecase := range combo.Usecases {
+		if strings.Contains(strings.ToLower(usecase), query) {
+			return true
+		}
+	}
+
+	return false
 }

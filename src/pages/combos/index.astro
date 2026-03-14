@@ -1,17 +1,25 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getRecommendedCombos } from "../../data/compat";
+import { getBestCombos } from "../../data/compat";
 
-const combos = getRecommendedCombos(undefined, 100);
+const combos = getBestCombos(undefined, 200);
 ---
 
 <Layout title="Combos" description="Browse model and harness combinations in the ai-compat dataset.">
   <a href="/" class="back-link">← home</a>
 
   <section class="detail-card">
-    <span class="eyebrow">Combos</span>
-    <h1>Combos</h1>
-    <p class="lede">Sorted by score so the best-fitting seeded stacks rise to the top.</p>
+    <div class="detail-header">
+      <div>
+        <span class="eyebrow">Combos</span>
+        <h1>Combos</h1>
+      </div>
+      <a class="button-ghost" href="/api/combos.json">JSON</a>
+    </div>
+    <p class="lede">
+      The full ranked matrix, sorted by overall pair score. Use the best-for
+      pages when you want rankings filtered to a specific workflow.
+    </p>
   </section>
 
   <section class="grid cols-2" style="margin-top: 1rem;">
@@ -25,6 +33,7 @@ const combos = getRecommendedCombos(undefined, 100);
         <div class="meta-row">
           <span class={`pill ${combo.status}`}>{combo.status}</span>
           {combo.usecaseDetails && <span class="pill">{combo.usecaseDetails.name}</span>}
+          {combo.modelDetails && <span class="pill">{combo.modelDetails.provider}</span>}
         </div>
       </a>
     ))}

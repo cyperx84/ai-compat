@@ -19,6 +19,7 @@ Compare Claude, GPT, Gemini and others with Claude Code, Codex CLI, OpenClaw, an
 	cmd.AddCommand(NewCompareCommand())
 	cmd.AddCommand(NewComboCommand())
 	cmd.AddCommand(NewBestCommand())
+	cmd.AddCommand(NewTiersCommand())
 
 	return cmd
 }

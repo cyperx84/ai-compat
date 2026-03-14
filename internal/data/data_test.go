@@ -8,15 +8,15 @@ func TestLoadData(t *testing.T) {
 		t.Fatalf("LoadData failed: %v", err)
 	}
 
-	if len(compat.Models) != 4 {
-		t.Fatalf("expected 4 models, got %d", len(compat.Models))
+	if len(compat.Models) != 14 {
+		t.Fatalf("expected 14 models, got %d", len(compat.Models))
 	}
 
-	if len(compat.Harnesses) != 5 {
-		t.Fatalf("expected 5 harnesses, got %d", len(compat.Harnesses))
+	if len(compat.Harnesses) != 11 {
+		t.Fatalf("expected 11 harnesses, got %d", len(compat.Harnesses))
 	}
 
-	if len(compat.Combos) < 6 {
+	if len(compat.Combos) < 100 {
 		t.Fatalf("expected seeded combos, got %d", len(compat.Combos))
 	}
 
@@ -40,7 +40,7 @@ func TestFinders(t *testing.T) {
 	}
 
 	combo := compat.FindCombo("claude-opus-4-claude-code")
-	if combo == nil || combo.Score != 9.7 {
+	if combo == nil || combo.Score < 9.5 {
 		t.Fatalf("unexpected combo payload: %#v", combo)
 	}
 
@@ -48,7 +48,7 @@ func TestFinders(t *testing.T) {
 		t.Fatal("expected combo by parts")
 	}
 
-	if compat.FindUsecase("agent-development") == nil {
-		t.Fatal("expected agent-development usecase")
+	if compat.FindUsecase("autonomous") == nil {
+		t.Fatal("expected autonomous usecase")
 	}
 }

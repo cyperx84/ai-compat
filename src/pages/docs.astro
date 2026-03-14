@@ -1,0 +1,48 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Docs" description="API, CLI, and skill usage documentation for ai-compat.info.">
+  <a href="/" class="back-link">← home</a>
+
+  <section class="detail-card prose">
+    <span class="eyebrow">Documentation</span>
+    <h1>API, CLI, and skill usage</h1>
+    <p>
+      The same shared dataset powers the Astro site, the JSON API, the `aicomp`
+      CLI, and the skill scaffold under `skills/ai-compat/SKILL.md`.
+    </p>
+  </section>
+
+  <div class="section-stack" style="margin-top: 1rem;">
+    <section class="section-card prose">
+      <h2>API</h2>
+      <ul>
+        <li>`/api/models.json`, `/api/harnesses.json`, `/api/combos.json`</li>
+        <li>`/api/recommend.json?usecase=coding&limit=5`</li>
+        <li>`/api/tiers/models.json`, `/api/tiers/harnesses.json`</li>
+        <li>`/api/best/coding.json`, `/api/best/research.json`, and the other workflow pages</li>
+      </ul>
+    </section>
+
+    <section class="section-card prose">
+      <h2>CLI</h2>
+      <ul>
+        <li>`aicomp search &lt;query&gt; [--json]`</li>
+        <li>`aicomp compare &lt;slugA&gt; &lt;slugB&gt; [--json]`</li>
+        <li>`aicomp combo --model &lt;slug&gt; --harness &lt;slug&gt; [--json]`</li>
+        <li>`aicomp best --for coding|research|autonomous|local|budget [--json]`</li>
+        <li>`aicomp tiers models [--json]` and `aicomp tiers harnesses [--json]`</li>
+      </ul>
+    </section>
+
+    <section class="section-card prose">
+      <h2>Skill usage</h2>
+      <p>
+        The OpenClaw skill scaffold points agents at the CLI and JSON routes so
+        they can search the dataset, compare options, and fetch recommendations
+        for a specific use case without duplicating compatibility knowledge.
+      </p>
+    </section>
+  </div>
+</Layout>

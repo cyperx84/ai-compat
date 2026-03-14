@@ -1,25 +1,34 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { compatData, getRecommendedCombos } from "../data/compat";
+import {
+  compatData,
+  getBestCombos,
+  getHarnessRankings,
+  getModelRankings,
+} from "../data/compat";
 
-const featured = getRecommendedCombos(undefined, 3);
+const featuredCombos = getBestCombos(undefined, 4);
+const topModels = getModelRankings().slice(0, 3);
+const topHarnesses = getHarnessRankings().slice(0, 3);
 ---
 
 <Layout
-  title="Find the right AI stack"
-  description="Browse a compact compatibility matrix for models, harnesses, and recommended pairings."
+  title="Model and Harness Compatibility"
+  description="Ranked compatibility data for AI models, coding harnesses, and recommended combinations."
 >
   <section class="hero">
-    <span class="eyebrow">ai-compat.info MVP</span>
-    <h1>Find a model + harness combo that actually fits the job.</h1>
+    <span class="eyebrow">Ranked AI Tooling Compatibility</span>
+    <h1>Find the right model and harness pair for the way you actually work.</h1>
     <p class="lede">
-      Shared structured data powers the site, JSON endpoints, and the `aicomp`
-      CLI. Browse the matrix, inspect detail pages, or pull recommendations by
-      use case.
+      `ai-compat.info` tracks realistic pairings across coding, research,
+      autonomous, local-first, and budget-driven workflows. The same dataset
+      powers this site, JSON endpoints, the `aicomp` CLI, and agent-facing
+      skills.
     </p>
-    <div class="button-row">
-      <a class="button primary" href="/matrix">Open matrix</a>
-      <a class="button" href="/api/recommend.json">See JSON recommendations</a>
+    <div class="button-row" style="margin-top: 1.2rem;">
+      <a class="button" href="/tiers/models">Model tiers</a>
+      <a class="button-ghost" href="/best/coding">Best for coding</a>
+      <a class="button-ghost" href="/docs">API + CLI docs</a>
     </div>
     <div class="stats">
       <div class="stat">
@@ -32,7 +41,7 @@ const featured = getRecommendedCombos(undefined, 3);
       </div>
       <div class="stat">
         <div class="stat-value">{compatData.combos.length}</div>
-        <div class="stat-label">Combos</div>
+        <div class="stat-label">Ranked Combos</div>
       </div>
       <div class="stat">
         <div class="stat-value">{compatData.usecases.length}</div>
@@ -42,11 +51,34 @@ const featured = getRecommendedCombos(undefined, 3);
   </section>
 
   <div class="section-stack">
+    <section class="grid cols-3">
+      <a class="feature-card" href="/matrix">
+        <span class="eyebrow">Matrix</span>
+        <h2>Compare the whole field</h2>
+        <p>Browse a full model-by-harness matrix and drill into each pairing.</p>
+      </a>
+      <a class="feature-card" href="/tiers">
+        <span class="eyebrow">Tiers</span>
+        <h2>See the aggregate leaders</h2>
+        <p>Grouped S/A/B/C rankings for both models and harnesses.</p>
+      </a>
+      <a class="feature-card" href="/best">
+        <span class="eyebrow">Best For</span>
+        <h2>Pick by workflow, not hype</h2>
+        <p>Get ranked recommendations with pros, cons, and why they fit.</p>
+      </a>
+    </section>
+
     <section class="section-card">
-      <h2>Top combinations</h2>
-      <p>Highest-scoring seeded combinations from the shared dataset.</p>
-      <div class="grid cols-3" style="margin-top: 1rem;">
-        {featured.map((combo) => (
+      <div class="split-header">
+        <div>
+          <span class="eyebrow">Featured Combos</span>
+          <h2>Highest scoring stacks right now</h2>
+        </div>
+        <a class="button-ghost" href="/combos">View all combos</a>
+      </div>
+      <div class="grid cols-2" style="margin-top: 1rem;">
+        {featuredCombos.map((combo) => (
           <a class="list-card" href={`/combos/${combo.slug}`}>
             <div class="list-head">
               <strong>{combo.name}</strong>
@@ -56,6 +88,7 @@ const featured = getRecommendedCombos(undefined, 3);
             <div class="meta-row">
               <span class={`pill ${combo.status}`}>{combo.status}</span>
               {combo.usecaseDetails && <span class="pill">{combo.usecaseDetails.name}</span>}
+              {combo.modelDetails && <span class="pill">{combo.modelDetails.provider}</span>}
             </div>
           </a>
         ))}
@@ -64,32 +97,50 @@ const featured = getRecommendedCombos(undefined, 3);
 
     <section class="grid cols-2">
       <div class="section-card">
-        <h2>Models</h2>
-        <p>Reasoning, coding, and multimodal models represented in the matrix.</p>
+        <div class="split-header">
+          <div>
+            <span class="eyebrow">Model Tiers</span>
+            <h2>Top models by aggregate pair quality</h2>
+          </div>
+          <a class="button-ghost" href="/tiers/models">See model tiers</a>
+        </div>
         <div class="grid" style="margin-top: 1rem;">
-          {compatData.models.map((model) => (
-            <a class="list-card" href={`/models/${model.slug}`}>
+          {topModels.map((entry) => (
+            <a class="list-card" href={`/models/${entry.item.slug}`}>
               <div class="list-head">
-                <strong>{model.name}</strong>
-                <span class="pill">{model.provider}</span>
+                <strong>{entry.item.name}</strong>
+                <span class={`tier-badge tier-${entry.tier.toLowerCase()}`}>{entry.tier}</span>
               </div>
-              <p class="detail-copy">{model.description}</p>
+              <p class="detail-copy">{entry.item.description}</p>
+              <div class="meta-row">
+                <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
+                <span class="pill">{entry.comboCount} combos</span>
+              </div>
             </a>
           ))}
         </div>
       </div>
 
       <div class="section-card">
-        <h2>Harnesses</h2>
-        <p>Terminal agents, editors, and agent runtimes scored against the same models.</p>
+        <div class="split-header">
+          <div>
+            <span class="eyebrow">Harness Tiers</span>
+            <h2>Top harnesses across the matrix</h2>
+          </div>
+          <a class="button-ghost" href="/tiers/harnesses">See harness tiers</a>
+        </div>
         <div class="grid" style="margin-top: 1rem;">
-          {compatData.harnesses.map((harness) => (
-            <a class="list-card" href={`/harnesses/${harness.slug}`}>
+          {topHarnesses.map((entry) => (
+            <a class="list-card" href={`/harnesses/${entry.item.slug}`}>
               <div class="list-head">
-                <strong>{harness.name}</strong>
-                <span class={`pill ${harness.status}`}>{harness.status}</span>
+                <strong>{entry.item.name}</strong>
+                <span class={`tier-badge tier-${entry.tier.toLowerCase()}`}>{entry.tier}</span>
               </div>
-              <p class="detail-copy">{harness.description}</p>
+              <p class="detail-copy">{entry.item.description}</p>
+              <div class="meta-row">
+                <span class="score-chip">{entry.aggregateScore.toFixed(1)}</span>
+                <span class="pill">{entry.comboCount} combos</span>
+              </div>
             </a>
           ))}
         </div>

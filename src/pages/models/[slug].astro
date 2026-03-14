@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { compatData, getCombosForModel } from "../../data/compat";
+import { compatData, getCombosForModel, getTierForScore, getUsecasesForCombo } from "../../data/compat";
 
 export function getStaticPaths() {
   return compatData.models.map((model) => ({
@@ -11,6 +11,9 @@ export function getStaticPaths() {
 
 const { model } = Astro.props;
 const combos = getCombosForModel(model.slug).sort((left, right) => right.score - left.score);
+const aggregateScore =
+  combos.reduce((sum, combo) => sum + combo.score, 0) / Math.max(combos.length, 1);
+const tier = getTierForScore(aggregateScore);
 ---
 
 <Layout title={model.name} description={model.description}>
@@ -23,25 +26,30 @@ const combos = getCombosForModel(model.slug).sort((left, right) => right.score -
         <h1>{model.name}</h1>
       </div>
       <div class="detail-meta">
+        <span class={`tier-badge tier-${tier.toLowerCase()}`}>{tier}</span>
         {model.contextWindow && <span class="pill">{model.contextWindow}</span>}
         {model.released && <span class="pill">{model.released}</span>}
       </div>
     </div>
-    <p class="detail-copy">{model.description}</p>
+    <p class="lede">{model.description}</p>
+    <div class="meta-row" style="margin-top: 1rem;">
+      <span class="score-chip">{aggregateScore.toFixed(1)} avg</span>
+      <span class="pill">{combos.length} combos scored</span>
+    </div>
     <div class="tag-row">
       {model.capabilities.map((capability: string) => (
         <span class="tag">{capability}</span>
       ))}
     </div>
     {model.website && (
-      <div class="button-row">
-        <a class="button" href={model.website} target="_blank" rel="noreferrer">Provider website</a>
+      <div class="button-row" style="margin-top: 1rem;">
+        <a class="button-ghost" href={model.website} target="_blank" rel="noreferrer">Provider website</a>
       </div>
     )}
   </section>
 
   <section class="section-card" style="margin-top: 1rem;">
-    <h2>Compatible harnesses</h2>
+    <h2>Best harness pairings</h2>
     <div class="grid" style="margin-top: 1rem;">
       {combos.map((combo) => (
         <a class="list-card" href={`/combos/${combo.slug}`}>
@@ -52,7 +60,9 @@ const combos = getCombosForModel(model.slug).sort((left, right) => right.score -
           <p class="detail-copy">{combo.description}</p>
           <div class="meta-row">
             <span class={`pill ${combo.status}`}>{combo.status}</span>
-            {combo.usecase && <span class="pill">{combo.usecase}</span>}
+            {getUsecasesForCombo(combo).slice(0, 3).map((usecase) => (
+              <span class="pill">{usecase.name}</span>
+            ))}
           </div>
         </a>
       ))}

@@ -62,6 +62,15 @@ func NewComboCommand() *cobra.Command {
 			if payload.Usecase != nil {
 				writeLine(cmd.OutOrStdout(), "Best for: %s", payload.Usecase.Name)
 			}
+			if len(combo.Usecases) > 0 {
+				writeLine(cmd.OutOrStdout(), "Also fits: %s", joinList(combo.Usecases))
+			}
+			if len(combo.Pros) > 0 {
+				writeLine(cmd.OutOrStdout(), "Pros: %s", joinList(combo.Pros))
+			}
+			if len(combo.Cons) > 0 {
+				writeLine(cmd.OutOrStdout(), "Cons: %s", joinList(combo.Cons))
+			}
 			if combo.Notes != "" {
 				writeLine(cmd.OutOrStdout(), "Notes: %s", combo.Notes)
 			}

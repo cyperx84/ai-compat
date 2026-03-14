@@ -1,0 +1,48 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="About" description="What ai-compat.info is and how the dataset is maintained.">
+  <a href="/" class="back-link">← home</a>
+
+  <section class="detail-card prose">
+    <span class="eyebrow">About</span>
+    <h1>What this is</h1>
+    <p>
+      `ai-compat.info` is a compact compatibility layer for AI models and the
+      tools people actually drive them through: CLIs, editors, and autonomous
+      runtimes.
+    </p>
+    <p>
+      The site is opinionated on purpose. It treats pairings as products, not
+      just benchmark numbers, so the scoring reflects workflow fit, developer
+      ergonomics, and ecosystem maturity.
+    </p>
+  </section>
+
+  <section class="grid cols-3" style="margin-top: 1rem;">
+    <div class="section-card prose">
+      <h2>How data is sourced</h2>
+      <p>
+        The shared dataset in `src/data/compat.json` is manually curated. Model
+        capabilities, context windows, and harness descriptions are realistic
+        summaries, then pair scores are seeded to reflect practical fit.
+      </p>
+    </div>
+    <div class="section-card prose">
+      <h2>How to contribute</h2>
+      <p>
+        Open a PR that updates the dataset, any affected ranking logic, and
+        docs. Keep entries concrete, use consistent slugs, and explain the
+        reasoning for any score changes.
+      </p>
+    </div>
+    <div class="section-card prose">
+      <h2>Credits</h2>
+      <p>
+        This repo ships an Astro site, a Go CLI, JSON API routes, and an
+        OpenClaw skill scaffold that all read from the same compatibility file.
+      </p>
+    </div>
+  </section>
+</Layout>
